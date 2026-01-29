@@ -19,6 +19,11 @@ async function loadProducts() {
     }
 }
 
+let sortState = {
+    price: 'asc',
+    name: 'asc'
+};
+
 // Hiển thị sản phẩm
 function renderProducts(products) {
     const container = document.getElementById('products-container');
@@ -51,13 +56,27 @@ function renderProducts(products) {
 
 // Sắp xếp theo giá
 function sortByPrice() {
-    const sorted = [...allProducts].sort((a, b) => a.price - b.price);
+    const direction = sortState.price === 'asc' ? 'desc' : 'asc';
+    sortState.price = direction;
+
+    const sorted = [...allProducts].sort((a, b) =>
+        direction === 'asc' ? a.price - b.price : b.price - a.price
+    );
+
+    document.getElementById('btn-sort-price').innerHTML = `<span>💰</span> Giá ${direction === 'asc' ? '↑' : '↓'}`;
     renderProducts(sorted);
 }
 
 // Sắp xếp theo tên
 function sortByName() {
-    const sorted = [...allProducts].sort((a, b) => a.title.localeCompare(b.title));
+    const direction = sortState.name === 'asc' ? 'desc' : 'asc';
+    sortState.name = direction;
+
+    const sorted = [...allProducts].sort((a, b) =>
+        direction === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+    );
+
+    document.getElementById('btn-sort-name').innerHTML = `<span>📝</span> Tên ${direction === 'asc' ? '↑' : '↓'}`;
     renderProducts(sorted);
 }
 

@@ -3,60 +3,83 @@ let allProducts = [];
 // Load dữ liệu từ db.json
 async function loadProducts() {
     const container = document.getElementById('products-container');
-    container.innerHTML = '<div class="loading">Đang chuẩn bị không gian...</div>';
+    container.innerHTML = `
+        <tr>
+            <td colspan="6" class="text-center py-5">
+                <div class="spinner-border" role="status"></div>
+                <div class="mt-2 text-muted">Loading data...</div>
+            </td>
+        </tr>
+    `;
 
     try {
         const response = await fetch('db.json');
         if (!response.ok) {
-            throw new Error('Không thể tải file db.json');
+            throw new Error('Could not load db.json file');
         }
 
         allProducts = await response.json();
-        renderProducts(allProducts);
+        processProducts();
     } catch (error) {
         console.error('Lỗi:', error);
-        container.innerHTML = `<div class="error">❌ Lỗi: ${error.message}</div>`;
+        container.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-5">
+                    <div class="alert alert-danger d-inline-block">❌ Error: ${error.message}</div>
+                </td>
+            </tr>
+        `;
     }
 }
 
 let sortState = {
     field: 'none',
-    price: 'asc',
-    name: 'asc'
+    directions: {
+        id: 'asc',
+        title: 'asc',
+        category: 'asc',
+        price: 'asc'
+    }
 };
 let searchQuery = '';
 
-// Hiển thị sản phẩm
+// Hiển thị sản phẩm dưới dạng bảng
 function renderProducts(products) {
     const container = document.getElementById('products-container');
 
     if (products.length === 0) {
-        container.innerHTML = '<div class="error">Không tìm thấy sản phẩm phù hợp</div>';
+        container.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-5 text-muted fst-italic">
+                    No matching products found
+                </td>
+            </tr>
+        `;
         return;
     }
 
-    container.innerHTML = products.map((product, index) => `
-        <div class="product-card" style="animation-delay: ${index * 0.05}s">
-            <div class="image-wrapper">
+    container.innerHTML = products.map(product => `
+        <tr>
+            <td>
                 <img src="${product.images[0] || 'https://placehold.co/600x400'}" 
                      alt="${product.title}" 
-                     class="product-image"
+                     class="product-thumb"
                      onerror="this.src='https://placehold.co/600x400'">
-                <span class="category-badge">${product.category?.name || 'Mới'}</span>
-            </div>
-            <div class="product-info">
-                <h2 class="product-title">${product.title}</h2>
-                <p class="product-description">${product.description}</p>
-                <div class="product-footer">
-                    <span class="product-price">$${product.price}</span>
-                    <span class="product-id">#${product.id}</span>
+            </td>
+            <td><code class="text-primary-emphasis fw-semibold">#${product.id}</code></td>
+            <td class="fw-bold text-white">${product.title}</td>
+            <td><span class="badge badge-category">${product.category?.name || 'New'}</span></td>
+            <td><span class="price-text">$${product.price}</span></td>
+            <td>
+                <div class="text-truncate" style="max-width: 300px;" title="${product.description}">
+                    ${product.description}
                 </div>
-            </div>
-        </div>
+            </td>
+        </tr>
     `).join('');
 }
 
-// Xử lý logic lọc và sắp xếp tập trung
+// Centralized filtering and sorting logic
 function processProducts() {
     let result = [...allProducts];
 
@@ -67,10 +90,22 @@ function processProducts() {
     }
 
     // 2. Sort
-    if (sortState.field === 'price') {
-        result.sort((a, b) => sortState.price === 'asc' ? a.price - b.price : b.price - a.price);
-    } else if (sortState.field === 'name') {
-        result.sort((a, b) => sortState.name === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
+    if (sortState.field !== 'none') {
+        const field = sortState.field;
+        const direction = sortState.directions[field];
+
+        result.sort((a, b) => {
+            let valA = field === 'category' ? (a.category?.name || '') : a[field];
+            let valB = field === 'category' ? (b.category?.name || '') : b[field];
+
+            if (typeof valA === 'string') {
+                return direction === 'asc'
+                    ? valA.localeCompare(valB)
+                    : valB.localeCompare(valA);
+            } else {
+                return direction === 'asc' ? valA - valB : valB - valA;
+            }
+        });
     }
 
     renderProducts(result);
@@ -78,44 +113,43 @@ function processProducts() {
 }
 
 function updateSortIcons() {
-    const priceBtn = document.getElementById('btn-sort-price');
-    const nameBtn = document.getElementById('btn-sort-name');
+    const headers = {
+        id: document.getElementById('header-id'),
+        title: document.getElementById('header-title'),
+        category: document.getElementById('header-category'),
+        price: document.getElementById('header-price')
+    };
 
-    if (priceBtn) {
-        priceBtn.innerHTML = `<span>💰</span> Giá ${sortState.price === 'asc' ? '↑' : '↓'}`;
-        priceBtn.classList.toggle('active', sortState.field === 'price');
-    }
-    if (nameBtn) {
-        nameBtn.innerHTML = `<span>📝</span> Tên ${sortState.name === 'asc' ? '↑' : '↓'}`;
-        nameBtn.classList.toggle('active', sortState.field === 'name');
-    }
+    Object.keys(headers).forEach(key => {
+        const el = headers[key];
+        if (!el) return;
+
+        if (sortState.field === key) {
+            el.classList.add('active');
+            const icon = sortState.directions[key] === 'asc' ? '↑' : '↓';
+            el.querySelector('.sort-icon').textContent = icon;
+        } else {
+            el.classList.remove('active');
+            el.querySelector('.sort-icon').textContent = '⇅';
+        }
+    });
 }
 
-// Sắp xếp theo giá
-function sortByPrice() {
-    if (sortState.field === 'price') {
-        sortState.price = sortState.price === 'asc' ? 'desc' : 'asc';
+// Generalized sort function
+function sortBy(field) {
+    if (sortState.field === field) {
+        sortState.directions[field] = sortState.directions[field] === 'asc' ? 'desc' : 'asc';
     } else {
-        sortState.field = 'price';
+        sortState.field = field;
     }
     processProducts();
 }
 
-// Sắp xếp theo tên
-function sortByName() {
-    if (sortState.field === 'name') {
-        sortState.name = sortState.name === 'asc' ? 'desc' : 'asc';
-    } else {
-        sortState.field = 'name';
-    }
-    processProducts();
-}
-
-// Tìm kiếm sản phẩm
+// Search products
 function searchProducts(query) {
     searchQuery = query;
     processProducts();
 }
 
-// Tự động load khi trang vừa mở
+// Auto load on open
 document.addEventListener('DOMContentLoaded', loadProducts);

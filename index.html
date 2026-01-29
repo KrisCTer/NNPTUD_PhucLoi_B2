@@ -4,21 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sản Phẩm Cao Cấp</title>
+    <title>Premium Product Management</title>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;800&display=swap"
         rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         :root {
             --primary: #6366f1;
             --primary-glow: rgba(99, 102, 241, 0.5);
             --secondary: #a855f7;
             --accent: #f43f5e;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.15);
             --text-main: #f8fafc;
             --text-muted: #cbd5e1;
-            --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
         * {
@@ -72,292 +74,200 @@
             }
         }
 
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 4rem;
-            position: relative;
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 2rem;
+            box-shadow: var(--card-shadow);
+            padding: 2.5rem;
+            margin-top: 2rem;
         }
 
         h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-size: clamp(2rem, 5vw, 3.5rem);
             font-weight: 800;
             background: linear-gradient(to right, #818cf8, #c084fc, #fb7185);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 1rem;
+            margin-bottom: 2rem;
             letter-spacing: -0.02em;
         }
 
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 3rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 1.5rem;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 2rem;
-            box-shadow: var(--card-shadow);
-            width: 100%;
+        .table {
+            --bs-table-bg: transparent;
+            --bs-table-color: var(--text-main);
+            color: var(--text-main);
+            vertical-align: middle;
+            margin-bottom: 0;
         }
 
-        .search-wrapper {
-            flex: 1;
-            min-width: 300px;
-            position: relative;
+        .table thead th {
+            background: rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            padding: 1.25rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .table thead th:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .table thead th.active {
+            color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .sort-icon {
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+
+        .active .sort-icon {
+            opacity: 1;
+        }
+
+        .table tbody td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .table tbody tr {
+            transition: background 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .product-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .search-input {
-            width: 100%;
-            padding: 0.75rem 1.5rem 0.75rem 3rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--glass-border);
-            border-radius: 1rem;
-            color: white;
-            font-family: 'Inter', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            color: white !important;
+            border-radius: 0.75rem;
+            padding-left: 2.5rem;
         }
 
         .search-input:focus {
-            outline: none;
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
+            box-shadow: 0 0 0 0.25rem var(--primary-glow);
         }
 
-        .search-icon {
-            position: absolute;
-            left: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        button {
-            padding: 0.75rem 1.5rem;
+        .btn-premium {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--glass-border);
             color: white;
             border-radius: 0.75rem;
-            cursor: pointer;
+            padding: 0.6rem 1.2rem;
             font-weight: 600;
-            font-family: 'Outfit', sans-serif;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            transition: all 0.3s ease;
         }
 
-        button:hover {
-            background: white;
-            color: #0f172a;
-            transform: translateY(-4px);
-            border-color: white;
-            box-shadow: 0 10px 20px -5px var(--primary-glow);
-        }
-
-        button.active {
+        .btn-premium:hover,
+        .btn-premium.active {
             background: var(--primary);
-            color: white;
             border-color: var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2.5rem;
-            margin-top: 1rem;
-        }
-
-        .product-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 2rem;
-            overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-card:hover {
-            transform: translateY(-12px) scale(1.02);
-            background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-
-        .image-wrapper {
-            position: relative;
-            padding: 1.25rem;
-        }
-
-        .product-image {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-            border-radius: 1.25rem;
-            background: #1e293b;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            transition: transform 0.5s ease;
-        }
-
-        .product-card:hover .product-image {
-            transform: scale(1.05);
-        }
-
-        .category-badge {
-            position: absolute;
-            top: 2rem;
-            right: 2.25rem;
-            padding: 0.4rem 1rem;
-            background: var(--primary);
             color: white;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--primary-glow);
         }
 
-        .product-info {
-            padding: 1.25rem 2rem 2rem;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 0.75rem;
-            min-height: 3.4rem;
-            line-height: 1.2;
-        }
-
-        .product-description {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-            flex-grow: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .product-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: auto;
-        }
-
-        .product-price {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 800;
+        .badge-category {
+            background: rgba(99, 102, 241, 0.2);
             color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            font-weight: 600;
         }
 
-        .product-id {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            opacity: 0.5;
+        .price-text {
+            font-weight: 700;
+            color: #818cf8;
+            font-family: 'Outfit', sans-serif;
         }
 
-        .loading {
+        .loading-container {
             text-align: center;
             padding: 5rem;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            animation: pulse 1.5s infinite;
         }
 
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 0.5;
-            }
-
-            50% {
-                opacity: 1;
-            }
-        }
-
-        .error {
-            background: rgba(244, 63, 94, 0.1);
-            color: #fb7185;
-            padding: 2rem;
-            border-radius: 1.5rem;
-            border: 1px solid rgba(244, 63, 94, 0.2);
-            text-align: center;
-            margin: 2rem auto;
-            max-width: 600px;
-        }
-
-        /* Initial animation for cards */
-        .product-card {
-            animation: reveal 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-            opacity: 0;
-            transform: translateY(20px);
-        }
-
-        @keyframes reveal {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: var(--primary);
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>Premium Gallery</h1>
-        </header>
+    <div class="container pb-5">
+        <div class="main-card">
+            <header class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+                <h1 class="m-0">Product Management</h1>
+                <div class="d-flex gap-2 align-items-center">
+                    <button class="btn btn-premium" onclick="loadProducts()">
+                        <span>🔄</span> Reload
+                    </button>
+                </div>
+            </header>
 
-        <div class="controls">
-            <div class="search-wrapper">
-                <span class="search-icon">🔍</span>
-                <input type="text" class="search-input" placeholder="Tìm kiếm sản phẩm..."
-                    oninput="searchProducts(this.value)">
+            <div class="row g-3 mb-4">
+                <div class="col-12 position-relative">
+                    <span class="position-absolute top-50 translate-middle-y ps-3 text-muted">🔍</span>
+                    <input type="text" class="form-control search-input" placeholder="Search products by name..."
+                        oninput="searchProducts(this.value)">
+                </div>
             </div>
-            <button onclick="loadProducts()"><span>🔄</span> Tải lại</button>
-            <button id="btn-sort-price" onclick="sortByPrice()"><span>💰</span> Giá ↑</button>
-            <button id="btn-sort-name" onclick="sortByName()"><span>📝</span> Tên ↑</button>
-        </div>
 
-        <div id="products-container" class="products-grid">
-            <div class="loading">Đang chuẩn bị không gian...</div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th id="header-id" onclick="sortBy('id')">ID <span class="sort-icon">⇅</span></th>
+                            <th id="header-title" onclick="sortBy('title')">Product Name <span
+                                    class="sort-icon">⇅</span></th>
+                            <th id="header-category" onclick="sortBy('category')">Category <span
+                                    class="sort-icon">⇅</span></th>
+                            <th id="header-price" onclick="sortBy('price')">Price <span class="sort-icon">⇅</span></th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-container">
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="spinner-border" role="status"></div>
+                                <div class="mt-2 text-muted">Loading data...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="main.js"></script>
 </body>
 

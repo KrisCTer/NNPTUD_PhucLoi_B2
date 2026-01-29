@@ -167,6 +167,13 @@
             box-shadow: 0 10px 20px -5px var(--primary-glow);
         }
 
+        button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
         button:active {
             transform: scale(0.95);
         }
@@ -342,8 +349,8 @@
                     oninput="searchProducts(this.value)">
             </div>
             <button onclick="loadProducts()"><span>🔄</span> Tải lại</button>
-            <button onclick="sortByPrice()"><span>💰</span> Sắp xếp giá</button>
-            <button onclick="sortByName()"><span>📝</span> Sắp xếp tên</button>
+            <button id="btn-sort-price" onclick="sortByPrice()"><span>💰</span> Giá ↑</button>
+            <button id="btn-sort-name" onclick="sortByName()"><span>📝</span> Tên ↑</button>
         </div>
 
         <div id="products-container" class="products-grid">

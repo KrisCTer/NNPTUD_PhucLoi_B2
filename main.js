@@ -20,21 +20,23 @@ async function loadProducts() {
 }
 
 let sortState = {
+    field: 'none',
     price: 'asc',
     name: 'asc'
 };
+let searchQuery = '';
 
 // Hiển thị sản phẩm
 function renderProducts(products) {
     const container = document.getElementById('products-container');
 
     if (products.length === 0) {
-        container.innerHTML = '<div class="error">Không có sản phẩm nào</div>';
+        container.innerHTML = '<div class="error">Không tìm thấy sản phẩm phù hợp</div>';
         return;
     }
 
     container.innerHTML = products.map((product, index) => `
-        <div class="product-card" style="animation-delay: ${index * 0.1}s">
+        <div class="product-card" style="animation-delay: ${index * 0.05}s">
             <div class="image-wrapper">
                 <img src="${product.images[0] || 'https://placehold.co/600x400'}" 
                      alt="${product.title}" 
@@ -54,45 +56,66 @@ function renderProducts(products) {
     `).join('');
 }
 
+// Xử lý logic lọc và sắp xếp tập trung
+function processProducts() {
+    let result = [...allProducts];
+
+    // 1. Filter
+    if (searchQuery) {
+        const term = searchQuery.toLowerCase().trim();
+        result = result.filter(p => p.title.toLowerCase().includes(term));
+    }
+
+    // 2. Sort
+    if (sortState.field === 'price') {
+        result.sort((a, b) => sortState.price === 'asc' ? a.price - b.price : b.price - a.price);
+    } else if (sortState.field === 'name') {
+        result.sort((a, b) => sortState.name === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
+    }
+
+    renderProducts(result);
+    updateSortIcons();
+}
+
+function updateSortIcons() {
+    const priceBtn = document.getElementById('btn-sort-price');
+    const nameBtn = document.getElementById('btn-sort-name');
+
+    if (priceBtn) {
+        priceBtn.innerHTML = `<span>💰</span> Giá ${sortState.price === 'asc' ? '↑' : '↓'}`;
+        priceBtn.classList.toggle('active', sortState.field === 'price');
+    }
+    if (nameBtn) {
+        nameBtn.innerHTML = `<span>📝</span> Tên ${sortState.name === 'asc' ? '↑' : '↓'}`;
+        nameBtn.classList.toggle('active', sortState.field === 'name');
+    }
+}
+
 // Sắp xếp theo giá
 function sortByPrice() {
-    const direction = sortState.price === 'asc' ? 'desc' : 'asc';
-    sortState.price = direction;
-
-    const sorted = [...allProducts].sort((a, b) =>
-        direction === 'asc' ? a.price - b.price : b.price - a.price
-    );
-
-    document.getElementById('btn-sort-price').innerHTML = `<span>💰</span> Giá ${direction === 'asc' ? '↑' : '↓'}`;
-    renderProducts(sorted);
+    if (sortState.field === 'price') {
+        sortState.price = sortState.price === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortState.field = 'price';
+    }
+    processProducts();
 }
 
 // Sắp xếp theo tên
 function sortByName() {
-    const direction = sortState.name === 'asc' ? 'desc' : 'asc';
-    sortState.name = direction;
+    if (sortState.field === 'name') {
+        sortState.name = sortState.name === 'asc' ? 'desc' : 'asc';
+    } else {
+        sortState.field = 'name';
+    }
+    processProducts();
+}
 
-    const sorted = [...allProducts].sort((a, b) =>
-        direction === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
-    );
-
-    document.getElementById('btn-sort-name').innerHTML = `<span>📝</span> Tên ${direction === 'asc' ? '↑' : '↓'}`;
-    renderProducts(sorted);
+// Tìm kiếm sản phẩm
+function searchProducts(query) {
+    searchQuery = query;
+    processProducts();
 }
 
 // Tự động load khi trang vừa mở
 document.addEventListener('DOMContentLoaded', loadProducts);
-
-// Tìm kiếm sản phẩm
-function searchProducts(query) {
-    const searchTerm = query.toLowerCase().trim();
-    if (!searchTerm) {
-        renderProducts(allProducts);
-        return;
-    }
-
-    const filtered = allProducts.filter(product =>
-        product.title.toLowerCase().includes(searchTerm)
-    );
-    renderProducts(filtered);
-}

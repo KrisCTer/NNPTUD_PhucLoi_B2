@@ -101,12 +101,47 @@
             margin-bottom: 3rem;
             justify-content: center;
             flex-wrap: wrap;
-            padding: 1rem;
+            padding: 1.5rem;
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 1.5rem;
+            border-radius: 2rem;
             box-shadow: var(--card-shadow);
+            width: 100%;
+        }
+
+        .search-wrapper {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1.5rem 0.75rem 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 1rem;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.5;
+            pointer-events: none;
         }
 
         button {
@@ -301,6 +336,11 @@
         </header>
 
         <div class="controls">
+            <div class="search-wrapper">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Tìm kiếm sản phẩm..."
+                    oninput="searchProducts(this.value)">
+            </div>
             <button onclick="loadProducts()"><span>🔄</span> Tải lại</button>
             <button onclick="sortByPrice()"><span>💰</span> Sắp xếp giá</button>
             <button onclick="sortByName()"><span>📝</span> Sắp xếp tên</button>

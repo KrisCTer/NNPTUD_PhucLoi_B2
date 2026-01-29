@@ -63,3 +63,17 @@ function sortByName() {
 
 // Tự động load khi trang vừa mở
 document.addEventListener('DOMContentLoaded', loadProducts);
+
+// Tìm kiếm sản phẩm
+function searchProducts(query) {
+    const searchTerm = query.toLowerCase().trim();
+    if (!searchTerm) {
+        renderProducts(allProducts);
+        return;
+    }
+
+    const filtered = allProducts.filter(product =>
+        product.title.toLowerCase().includes(searchTerm)
+    );
+    renderProducts(filtered);
+}

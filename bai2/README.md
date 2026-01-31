@@ -27,7 +27,15 @@ npm install json-server
 ```
 
 3. Quay lại terminal gõ lệnh để chạy server:
-- Lệnh đầy đủ: `npx json-server bai2/db.json --static bai2 --port 3000`
-- Lệnh rút gọn: `npm run bai2`
+```bash
+npm run bai2
+```
+
+Hoặc dùng lệnh đầy đủ:
+```powershell
+npx json-server bai2/db.json --static bai2 --port 3000
+```
+
+Sau đó truy cập: [http://localhost:3000](http://localhost:3000)
 
 **Lưu ý:** Nếu muốn tắt server thì bấm `Ctrl + C`.
